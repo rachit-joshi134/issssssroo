@@ -40,3 +40,9 @@ export async function checkAdmin(email,password){
  return bcrypt.compare(password,hash);
 }
 export function newId(prefix){return `${prefix}-${new Date().getFullYear()}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;}
+export const withEvent=fn=>async req=>{
+ const url=new URL(req.url);
+ const event={path:url.pathname,httpMethod:req.method,headers:Object.fromEntries(req.headers),queryStringParameters:Object.fromEntries(url.searchParams),body:req.method==="GET"||req.method==="HEAD"?"":await req.text()};
+ const r=await fn(event);
+ return new Response(r.body,{status:r.statusCode,headers:r.headers});
+};
